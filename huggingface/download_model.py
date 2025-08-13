@@ -10,7 +10,7 @@ def main():
     snapshot_download(
         repo_id=repo_id,
         local_dir="/models",
-        allow_patterns=["*.safetensors", "*.json", "*.txt"],
+        allow_patterns=["*"],
     )
 
 if __name__ == "__main__":
