@@ -19,4 +19,6 @@ FROM registry.access.redhat.com/ubi9/ubi-micro:9.4
 # Copy the model files from the base container
 COPY --from=base /models /models
 
+RUN chmod -Rf 775 /models
+
 USER 1001
