@@ -1,0 +1,36 @@
+## STAGE 1. Download model from Hugging Face
+FROM registry.access.redhat.com/ubi9/python-311:latest as base
+
+## need root since creating /models
+USER root
+
+# Model repo name from Hugging Face are downloaded to /models
+# https://huggingface.co/models
+ARG HUGGINGFACE_MODEL_REPO
+
+RUN pip install huggingface-hub
+
+COPY download_model.py .
+
+RUN python download_model.py 
+
+
+## STAGE 2. Use llama.cpp full to convert models to gguf format
+FROM ghcr.io/ggml-org/llama.cpp:full-b6485 as ggufmodel
+
+COPY --from=base /models /models
+
+WORKDIR /models
+
+RUN /app/convert_hf_to_gguf.py /models --outfile /models/model.gguf
+
+
+## COPY gguf model and supporting files to a micro image
+FROM registry.access.redhat.com/ubi9/ubi-micro:9.4
+
+# Copy the model files from the base container
+COPY --from=ggufmodel /models/model.gguf /models/model.gguf
+
+RUN chmod -Rf 775 /models
+
+USER 1001

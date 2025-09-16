@@ -16,3 +16,7 @@ AI Models stored in container images
 3. [ibm-granite/granite-embedding-english-r2](https://huggingface.co/ibm-granite/granite-embedding-english-r2)
    - Dockerhub: `docker.io/moosestack/granite-embedding-english-r2_packaged-modelcar:latest`
    - Build Example: `podman build --build-arg HUGGINGFACE_MODEL_REPO=ibm-granite/granite-embedding-english-r2 -t ibm-granite/granite-embedding-english-r2:latest ./huggingface`
+
+4. [Qwen/Qwen3-Embedding-0.6B](https://huggingface.co/Qwen/Qwen3-Embedding-0.6B)-GGUF(converted)
+   - Dockerhub: `docker.io/moosestack/qwen_qwen3-embedding-0.6b-gguf_packaged-modelcar:latest`
+   - Build Example: `podman build --build-arg HUGGINGFACE_MODEL_REPO=Qwen/Qwen3-Embedding-0.6B -t qwen/qwen3-embedding-0.6b-gguf:latest ./convert_to_gguf`
