@@ -14,9 +14,14 @@ AI Models stored in container images
    - Serve model using [llama.cpp](https://github.com/ggml-org/llama.cpp) on an x86-64 CPU:
      - `podman run -it -p 8080:8080 docker.io/moosestack/llama-cpp_gpt-oss-20b-gguf_cpu-x86-64:latest`
 
-3. [ibm-granite/granite-4.0-micro](ibm-granite/granite-4.0-micro)-GGUF(converted)
+3. [ibm-granite/granite-4.0-micro](https://huggingface.co/ibm-granite/granite-4.0-micro)-GGUF(converted)
    - Dockerhub: `docker.io/moosestack/granite-4.0-micro-gguf_packaged-modelcar:latest`
    - Build Example: `podman build --squash --build-arg HUGGINGFACE_MODEL_REPO=ibm-granite/granite-4.0-micro -t granite-4.0-micro:latest ./convert_to_gguf`
+
+4. [ibm-granite/granite-4.0-h-1b](https://huggingface.co/ibm-granite/granite-4.0-h-1b)
+   - Dockerhub: `docker.io/moosestack/granite-4.0-h-1b_packaged-modelcar:latest`
+   - Build Example: `podman build --squash --build-arg HUGGINGFACE_MODEL_REPO=ibm-granite/granite-4.0-h-1b -t granite-4.0-h-1b:latest ./huggingface`
+
 
 ## Embedding Models
 1. [ibm-granite/granite-embedding-english-r2](https://huggingface.co/ibm-granite/granite-embedding-english-r2)
