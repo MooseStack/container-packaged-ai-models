@@ -16,7 +16,7 @@ RUN python download_model.py
 
 
 ## STAGE 2. Use llama.cpp full to convert models to gguf format
-FROM ghcr.io/ggml-org/llama.cpp:full-b6485 as ggufmodel
+FROM ghcr.io/ggml-org/llama.cpp:full-b8740 as ggufmodel
 
 COPY --from=base /models /models
 

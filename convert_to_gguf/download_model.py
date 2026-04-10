@@ -2,7 +2,7 @@ import os
 from huggingface_hub import snapshot_download
 
 def main():
-    repo_id = os.getenv("HUGGINGFACE_MODEL_REPO")
+    repo_id = os.getenv("HUGGINGFACE_MODEL_REPO").lower()
     print(f"Downloading model from Hugging Face repository: {repo_id}")
     if not repo_id:
         raise EnvironmentError("HUGGINGFACE_MODEL_REPO environment variable is not set.")
