@@ -26,6 +26,10 @@ AI Models stored in container images
    - Dockerhub: `docker.io/moosestack/gemma-4-e4b-it-gguf_packaged-modelcar:latest`
    - Build Example: `podman build --squash --build-arg HUGGINGFACE_MODEL_REPO=google/gemma-4-E4B-it -t gemma-4-E4B-it:latest ./convert_to_gguf`
 
+6. [google/gemma-4-12B-it-qat-q4_0-gguf](https://huggingface.co/google/gemma-4-12B-it-qat-q4_0-gguf)
+   - Dockerhub: `docker.io/moosestack/gemma-4-12b-it-qat-q4_0-gguf_packaged-modelcar:latest`
+   - Build Example: `podman build --squash --build-arg HUGGINGFACE_MODEL_REPO=google/gemma-4-12B-it-qat-q4_0-gguf -t gemma-4-12b-it-qat-q4_0-gguf:latest ./huggingface`
+
 ## Embedding Models
 1. [ibm-granite/granite-embedding-english-r2](https://huggingface.co/ibm-granite/granite-embedding-english-r2)
    - Dockerhub: `docker.io/moosestack/granite-embedding-english-r2_packaged-modelcar:latest`
