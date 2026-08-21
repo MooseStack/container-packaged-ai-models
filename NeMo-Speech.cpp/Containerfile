@@ -1,0 +1,31 @@
+# Shared NeMo-Speech.cpp runtime image.
+ARG NEMO_SPEECH_VERSION=0.1.0
+
+FROM registry.access.redhat.com/ubi10/ubi-minimal:latest AS binary-builder
+ARG NEMO_SPEECH_VERSION
+
+RUN microdnf update -y && \
+    microdnf install -y tar gzip wget ca-certificates && \
+    microdnf clean all
+
+WORKDIR /build
+
+RUN mkdir -p /build/nemo-speech && \
+    wget -qO- "https://github.com/NVIDIA/NeMo-Speech.cpp/releases/download/v${NEMO_SPEECH_VERSION}/nemo-speech-${NEMO_SPEECH_VERSION}-linux-x86_64-cpu.tar.gz" | \
+    tar -xz -C /build/nemo-speech --strip-components=1
+
+FROM registry.access.redhat.com/ubi10/ubi-minimal:latest
+
+RUN microdnf update -y && microdnf clean all
+
+WORKDIR /app
+COPY --from=binary-builder /build/nemo-speech /opt/nemo-speech
+
+ENV PATH="/opt/nemo-speech:/opt/nemo-speech/bin:${PATH}"
+
+RUN chown -R 1001:0 /opt/nemo-speech /app && \
+    chmod -R g+rwX /opt/nemo-speech /app
+
+USER 1001
+EXPOSE 8080
+ENTRYPOINT ["nemo-speech", "serve"]

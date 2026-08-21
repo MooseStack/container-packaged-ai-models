@@ -6,6 +6,8 @@ USER root
 # Model repo name from Hugging Face are downloaded to /models
 # https://huggingface.co/models
 ARG HUGGINGFACE_MODEL_REPO
+ARG HUGGINGFACE_ALLOW_PATTERNS="*"
+ENV HUGGINGFACE_ALLOW_PATTERNS=${HUGGINGFACE_ALLOW_PATTERNS}
 
 RUN pip install huggingface-hub
 
@@ -15,6 +17,8 @@ RUN python download_model.py
 
 # Final image containing only the essential model files
 FROM registry.access.redhat.com/ubi9/ubi-micro:9.4
+
+LABEL org.opencontainers.image.source="https://github.com/MooseStack/container-packaged-ai-models"
 
 # Copy the model files from the base container
 COPY --from=base /models /models
