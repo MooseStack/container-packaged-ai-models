@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nemotron-asr
+  labels:
+    app: nemotron-asr
+spec:
+  rules:
+    - host: null
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nemotron-asr
+                port:
+                  name: http

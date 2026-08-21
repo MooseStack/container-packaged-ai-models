@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nemotron-asr
+  labels:
+    app: nemotron-asr
+spec:
+  type: ClusterIP
+  selector:
+    app: nemotron-asr
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP
