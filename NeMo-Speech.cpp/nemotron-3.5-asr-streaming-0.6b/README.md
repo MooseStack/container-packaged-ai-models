@@ -2,7 +2,7 @@
 Build the shared runtime image first, then build this model image:
 
 ```bash
-podman build --build-arg NEMO_SPEECH_VERSION=0.1.0 \
+podman build --build-arg NEMO_SPEECH_VERSION=0.2.0 \
 	-t nemo-speech-runtime:latest \
 	-f NeMo-Speech.cpp/Containerfile NeMo-Speech.cpp
 

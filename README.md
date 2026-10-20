@@ -42,7 +42,15 @@ AI Models stored in container images
 
 ## Speech Models
 1. [nvidia/nemotron-3.5-asr-streaming-0.6b](https://huggingface.co/nvidia/nemotron-3.5-asr-streaming-0.6b)-GGUF(only GGUF download)
+   - This model does streaming (you can use a WebSocket)
    - Dockerhub: `docker.io/moosestack/nemotron-3.5-asr-streaming-0.6b-gguf_packaged-modelcar:latest`
    - Build Example: `podman build --squash --build-arg HUGGINGFACE_ALLOW_PATTERNS="*.gguf" --build-arg HUGGINGFACE_MODEL_REPO=nvidia/nemotron-3.5-asr-streaming-0.6b -t nemotron-3.5-asr-streaming-0.6b-gguf:latest ./huggingface`
    - Serve model using [NeMo-Speech.cpp](https://github.com/NVIDIA/NeMo-Speech.cpp) on an x86-64 CPU:
      - `podman run -it -p 8080:8080 docker.io/moosestack/nemo-speech-cpp_nemotron-3.5-asr-streaming-0.6b_cpu-x86-64:latest`
+
+2. [nvidia/parakeet-tdt-0.6b-v3](https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3)-GGUF(only GGUF download)
+   - This model does NOT do streaming. It transcribes recordings/batches of audio.
+   - Dockerhub: `docker.io/moosestack/parakeet-tdt-0.6b-v3-gguf_packaged-modelcar:latest`
+   - Build Example: `podman build --squash --build-arg HUGGINGFACE_ALLOW_PATTERNS="*.gguf" --build-arg HUGGINGFACE_MODEL_REPO=nvidia/parakeet-tdt-0.6b-v3 -t parakeet-tdt-0.6b-v3-gguf:latest ./huggingface`
+   - Serve model using [NeMo-Speech.cpp](https://github.com/NVIDIA/NeMo-Speech.cpp) on an x86-64 CPU:
+     - `podman run -it -p 8080:8080 docker.io/moosestack/nemo-speech-cpp_parakeet-tdt-0.6b-v3_cpu-x86-64:latest`
