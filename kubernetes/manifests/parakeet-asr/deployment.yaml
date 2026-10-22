@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: parakeet-asr-model
+  labels:
+    app: parakeet-asr-model
+    app.kubernetes.io/name: model
+    app.kubernetes.io/instance: parakeet-asr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: parakeet-asr-model
+  template:
+    metadata:
+      labels:
+        app: parakeet-asr-model
+    spec:
+      serviceAccountName: parakeet-asr-model
+      containers:
+        - name: model
+          image: docker.io/moosestack/nemo-speech-cpp_parakeet-tdt-0.6b-v3_cpu-x86-64:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          startupProbe:
+            tcpSocket:
+              port: http
+            failureThreshold: 30
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 30
+          resources:
+            requests:
+              cpu: "1"
+              memory: 2Gi
+            limits:
+              cpu: "4"
+              memory: 8Gi

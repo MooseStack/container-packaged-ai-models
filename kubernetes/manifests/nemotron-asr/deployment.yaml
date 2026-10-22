@@ -1,22 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nemotron-asr
+  name: nemotron-asr-model
   labels:
-    app: nemotron-asr
+    app: nemotron-asr-model
+    app.kubernetes.io/name: model
+    app.kubernetes.io/instance: nemotron-asr
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: nemotron-asr
+      app: nemotron-asr-model
   template:
     metadata:
       labels:
-        app: nemotron-asr
+        app: nemotron-asr-model
     spec:
-      serviceAccountName: nemotron-asr
+      serviceAccountName: nemotron-asr-model
       containers:
-        - name: nemotron-asr
+        - name: model
           image: docker.io/moosestack/nemo-speech-cpp_nemotron-3.5-asr-streaming-0.6b_cpu-x86-64:latest
           imagePullPolicy: Always
           ports:

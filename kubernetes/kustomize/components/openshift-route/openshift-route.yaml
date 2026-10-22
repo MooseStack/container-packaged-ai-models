@@ -1,13 +1,11 @@
 apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
-  name: nemotron-asr
-  labels:
-    app: nemotron-asr
+  name: model
 spec:
   to:
     kind: Service
-    name: nemotron-asr
+    name: model
     weight: 100
   port:
     targetPort: http

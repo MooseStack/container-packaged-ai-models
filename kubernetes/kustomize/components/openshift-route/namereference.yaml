@@ -1,0 +1,7 @@
+nameReference:
+  - kind: Service
+    fieldSpecs:
+      - path: spec/to/name
+        kind: Route
+        group: route.openshift.io
+        version: v1

@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+namePrefix: parakeet-asr-
+labels:
+  - pairs:
+      app: parakeet-asr
+    includeSelectors: true
+    includeTemplates: true
+images:
+  - name: model
+    newName: docker.io/moosestack/nemo-speech-cpp_parakeet-tdt-0.6b-v3_cpu-x86-64
+    newTag: latest

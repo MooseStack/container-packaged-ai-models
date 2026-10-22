@@ -1,0 +1,45 @@
+replicaCount: 1
+
+image:
+  repository: model
+  tag: latest
+  pullPolicy: Always
+
+serviceAccount:
+  create: true
+
+service:
+  type: ClusterIP
+  port: 8080
+
+resources:
+  requests:
+    cpu: "1"
+    memory: 2Gi
+  limits:
+    cpu: "4"
+    memory: 8Gi
+
+probes:
+  startup:
+    failureThreshold: 30
+    periodSeconds: 10
+  readiness:
+    periodSeconds: 10
+  liveness:
+    periodSeconds: 30
+
+ingress:
+  enabled: false
+  host: ""
+  path: /
+  pathType: Prefix
+
+route:
+  enabled: false
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+
+nameOverride: ""
+fullnameOverride: ""

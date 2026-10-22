@@ -20,6 +20,22 @@ podman run --rm -it \
 	parakeet-tdt-0.6b-v3:latest
 ```
 
+### Deploying with kubectl
+```bash
+kubectl apply -k https://github.com/MooseStack/container-packaged-ai-models.git/kubernetes/kustomize/overlays/parakeet-asr?ref=main
+```
+
+Use `parakeet-asr-ingress` or `parakeet-asr-openshift` instead for Ingress or an OpenShift Route.
+
+### Deploying with Helm
+```bash
+helm install parakeet-asr \
+  git+https://github.com/MooseStack/container-packaged-ai-models@kubernetes/helm?ref=main \
+  -f https://raw.githubusercontent.com/MooseStack/container-packaged-ai-models/main/kubernetes/helm/values/parakeet-asr.yaml
+```
+
+Add `--set ingress.enabled=true` or `--set route.enabled=true` for Ingress or an OpenShift Route.
+
 ### Offline transcription client
 Parakeet TDT is offline-only (full-utterance recognition). The test client records from the microphone until `Ctrl+C`, then `POST`s a WAV to `/v1/audio/transcriptions`. You can also pass an existing WAV file.
 
