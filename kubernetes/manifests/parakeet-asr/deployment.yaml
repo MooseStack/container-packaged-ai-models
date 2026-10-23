@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: parakeet-asr-model
+  name: parakeet-asr
   labels:
-    app: parakeet-asr-model
+    app: parakeet-asr
     app.kubernetes.io/name: model
     app.kubernetes.io/instance: parakeet-asr
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: parakeet-asr-model
+      app: parakeet-asr
   template:
     metadata:
       labels:
-        app: parakeet-asr-model
+        app: parakeet-asr
     spec:
-      serviceAccountName: parakeet-asr-model
+      serviceAccountName: parakeet-asr
       containers:
         - name: model
           image: docker.io/moosestack/nemo-speech-cpp_parakeet-tdt-0.6b-v3_cpu-x86-64:latest
