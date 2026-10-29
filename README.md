@@ -64,3 +64,8 @@ AI Models stored in container images
    - Serve model using [NeMo-Speech.cpp](https://github.com/NVIDIA/NeMo-Speech.cpp) on an x86-64 CPU:
      - `podman run -it -p 8080:8080 docker.io/moosestack/nemo-speech-cpp_parakeet-tdt-0.6b-v3_cpu-x86-64:latest`
      - `kubectl apply -f https://raw.githubusercontent.com/MooseStack/container-packaged-ai-models/main/kubernetes/manifests/parakeet-nemospeechcpp-asr.yaml`
+
+3. [nvidia/parakeet-tdt-0.6b-v3](https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3)-ONNX Int8(converted)
+   - This model does NOT do streaming. It transcribes recordings/batches of audio.
+   - Dockerhub: `docker.io/moosestack/parakeet-tdt-0.6b-v3-onnx-int8_packaged-modelcar:latest`
+   - Build Example: `podman build --squash --build-arg HUGGINGFACE_ALLOW_PATTERNS="*.nemo" --build-arg HUGGINGFACE_MODEL_REPO=nvidia/parakeet-tdt-0.6b-v3 -t docker.io/moosestack/parakeet-tdt-0.6b-v3-onnx-int8_packaged-modelcar:latest -f convert_to_onnx/parakeet-tdt-0.6b-v3-int8/parakeet.Containerfile ./huggingface`

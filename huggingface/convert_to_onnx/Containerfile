@@ -1,3 +1,5 @@
+## Supported models to be converted using this : https://github.com/microsoft/onnxruntime-genai/blob/main/src/python/py/models/README.md#current-support
+
 ## STAGE 1. Download Hugging Face Transformers model (safetensors)
 FROM registry.access.redhat.com/ubi9/python-311:latest AS download
 

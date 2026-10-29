@@ -1,0 +1,8 @@
+nemo_toolkit[asr]
+numpy<2
+pyarrow<18
+ipython
+kaldi-native-fbank
+librosa
+onnx==1.17.0
+onnxruntime==1.17.1
