@@ -69,3 +69,5 @@ AI Models stored in container images
    - This model does NOT do streaming. It transcribes recordings/batches of audio.
    - Dockerhub: `docker.io/moosestack/parakeet-tdt-0.6b-v3-onnx-int8_packaged-modelcar:latest`
    - Build Example: `podman build --squash --build-arg HUGGINGFACE_ALLOW_PATTERNS="*.nemo" --build-arg HUGGINGFACE_MODEL_REPO=nvidia/parakeet-tdt-0.6b-v3 -t docker.io/moosestack/parakeet-tdt-0.6b-v3-onnx-int8_packaged-modelcar:latest -f convert_to_onnx/parakeet-tdt-0.6b-v3-int8/parakeet.Containerfile ./huggingface`
+   - Serve model using [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx) on an x86-64 CPU:
+     - `podman run -it -p 8080:8080 docker.io/moosestack/sherpa-onnx_parakeet-tdt-0.6b-v3-int8_cpu-x86-64:latest`

@@ -1,0 +1,30 @@
+# Shared sherpa-onnx runtime (CPU x86-64).
+# Serves offline ASR via a minimal OpenAI-compatible HTTP API.
+# https://github.com/k2-fsa/sherpa-onnx
+FROM registry.access.redhat.com/ubi9/python-311:latest
+
+USER root
+WORKDIR /app
+
+RUN pip install --no-cache-dir numpy sherpa-onnx
+
+COPY serve.py /app/serve.py
+
+RUN chown -R 1001:0 /app && \
+    chmod -R g+rwX /app
+
+USER 1001
+ENV MODEL_PATH=/models \
+    MODEL_NAME=default \
+    ENCODER=encoder.onnx \
+    DECODER=decoder.onnx \
+    JOINER=joiner.onnx \
+    TOKENS=tokens.txt \
+    MODEL_TYPE=transducer \
+    FEATURE_DIM=80 \
+    HOST=0.0.0.0 \
+    PORT=8080 \
+    NUM_THREADS=4
+
+EXPOSE 8080
+ENTRYPOINT ["python", "/app/serve.py"]

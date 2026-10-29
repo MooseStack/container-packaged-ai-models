@@ -1,0 +1,17 @@
+FROM sherpa-onnx-runtime:latest
+
+# Copy the int8 ONNX package from the external modelcar image.
+USER root
+COPY --from=docker.io/moosestack/parakeet-tdt-0.6b-v3-onnx-int8_packaged-modelcar:latest /models /models
+
+# OpenShift assigns a random UID with GID 0.
+RUN chown -R 1001:0 /models && \
+    chmod -R g+rwX /models
+
+USER 1001
+ENV MODEL_NAME=parakeet-tdt-0.6b-v3-int8 \
+    ENCODER=encoder.int8.onnx \
+    DECODER=decoder.int8.onnx \
+    JOINER=joiner.int8.onnx \
+    MODEL_TYPE=nemo_transducer \
+    FEATURE_DIM=128
