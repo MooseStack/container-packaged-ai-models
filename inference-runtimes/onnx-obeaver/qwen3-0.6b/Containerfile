@@ -1,0 +1,11 @@
+FROM onnx-obeaver-runtime:latest
+
+# Copy the ORT GenAI model package from the external modelcar image.
+USER root
+COPY --from=docker.io/moosestack/qwen3-0.6b-onnx-genai-int4_packaged-modelcar:latest /models /models
+
+# OpenShift assigns a random UID with GID 0.
+RUN chown -R 1001:0 /models && \
+    chmod -R g+rwX /models
+
+USER 1001

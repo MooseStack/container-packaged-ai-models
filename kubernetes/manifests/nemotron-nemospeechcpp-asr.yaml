@@ -1,0 +1,74 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: nemotron-nemospeechcpp-asr
+  labels:
+    app: nemotron-nemospeechcpp-asr
+    app.kubernetes.io/name: model
+    app.kubernetes.io/instance: nemotron-nemospeechcpp-asr
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nemotron-nemospeechcpp-asr
+  labels:
+    app: nemotron-nemospeechcpp-asr
+    app.kubernetes.io/name: model
+    app.kubernetes.io/instance: nemotron-nemospeechcpp-asr
+spec:
+  type: ClusterIP
+  selector:
+    app: nemotron-nemospeechcpp-asr
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nemotron-nemospeechcpp-asr
+  labels:
+    app: nemotron-nemospeechcpp-asr
+    app.kubernetes.io/name: model
+    app.kubernetes.io/instance: nemotron-nemospeechcpp-asr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nemotron-nemospeechcpp-asr
+  template:
+    metadata:
+      labels:
+        app: nemotron-nemospeechcpp-asr
+    spec:
+      serviceAccountName: nemotron-nemospeechcpp-asr
+      containers:
+        - name: model
+          image: docker.io/moosestack/nemo-speech-cpp_nemotron-3.5-asr-streaming-0.6b_cpu-x86-64:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          startupProbe:
+            tcpSocket:
+              port: http
+            failureThreshold: 30
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 30
+          resources:
+            requests:
+              cpu: "1"
+              memory: 2Gi
+            limits:
+              cpu: "4"
+              memory: 8Gi

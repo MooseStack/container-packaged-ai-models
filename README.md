@@ -17,19 +17,27 @@ AI Models stored in container images
 
 3. [ibm-granite/granite-4.0-micro](https://huggingface.co/ibm-granite/granite-4.0-micro)-GGUF(converted)
    - Dockerhub: `docker.io/moosestack/granite-4.0-micro-gguf_packaged-modelcar:latest`
-   - Build Example: `podman build --squash --build-arg HUGGINGFACE_MODEL_REPO=ibm-granite/granite-4.0-micro -t granite-4.0-micro:latest ./huggingface/convert_to_gguf`
+   - Build Example: `podman build --squash --build-arg HUGGINGFACE_MODEL_REPO=ibm-granite/granite-4.0-micro -t granite-4.0-micro:latest -f convert_to_gguf/Containerfile ./huggingface`
 
 4. [ibm-granite/granite-4.0-h-1b](https://huggingface.co/ibm-granite/granite-4.0-h-1b)
    - Dockerhub: `docker.io/moosestack/granite-4.0-h-1b_packaged-modelcar:latest`
    - Build Example: `podman build --squash --build-arg HUGGINGFACE_MODEL_REPO=ibm-granite/granite-4.0-h-1b -t granite-4.0-h-1b:latest ./huggingface`
-   - 
+
 5. [google/gemma-4-E4B-it](https://huggingface.co/google/gemma-4-E4B-it)-GGUF(converted)
    - Dockerhub: `docker.io/moosestack/gemma-4-e4b-it-gguf_packaged-modelcar:latest`
-   - Build Example: `podman build --squash --build-arg HUGGINGFACE_MODEL_REPO=google/gemma-4-E4B-it -t gemma-4-E4B-it:latest ./huggingface/convert_to_gguf`
+   - Build Example: `podman build --squash --build-arg HUGGINGFACE_MODEL_REPO=google/gemma-4-E4B-it -t gemma-4-E4B-it:latest -f convert_to_gguf/Containerfile ./huggingface`
 
 6. [google/gemma-4-12B-it-qat-q4_0-gguf](https://huggingface.co/google/gemma-4-12B-it-qat-q4_0-gguf)
    - Dockerhub: `docker.io/moosestack/gemma-4-12b-it-qat-q4_0-gguf_packaged-modelcar:latest`
    - Build Example: `podman build --squash --build-arg HUGGINGFACE_MODEL_REPO=google/gemma-4-12B-it-qat-q4_0-gguf -t gemma-4-12b-it-qat-q4_0-gguf:latest ./huggingface`
+
+7. [Qwen/Qwen3-0.6B](https://huggingface.co/Qwen/Qwen3-0.6B)-ONNX Runtime GenAI Int4(converted)
+   - Dockerhub: `docker.io/moosestack/qwen3-0.6b-onnx-genai-int4_packaged-modelcar:latest`
+   - Build Example: `podman build --squash --build-arg HUGGINGFACE_ALLOW_PATTERNS="*.json, *.safetensors" --build-arg HUGGINGFACE_MODEL_REPO=Qwen/Qwen3-0.6B -t docker.io/moosestack/qwen3-0.6b-onnx-genai-int4_packaged-modelcar:latest -f convert_to_onnx/Containerfile ./huggingface`
+   - Uses Microsoft's [`onnxruntime_genai.models.builder`](https://github.com/microsoft/onnxruntime-genai) (`GENAI_PRECISION=int4` default; optional `GENAI_EP=cpu`).
+   - Serve with [oBeaver](https://github.com/microsoft/obeaver) OpenAI-compatible API (ONNX Runtime GenAI) on an x86-64 CPU:
+     - `podman run -it -p 8080:8080 docker.io/moosestack/onnx-obeaver_qwen3-0.6b_cpu-x86-64:latest`
+     - `kubectl apply -f https://raw.githubusercontent.com/MooseStack/container-packaged-ai-models/main/kubernetes/manifests/qwen3-0.6b-onnx-obeaver-text.yaml`
 
 ## Embedding Models
 1. [ibm-granite/granite-embedding-english-r2](https://huggingface.co/ibm-granite/granite-embedding-english-r2)
@@ -38,7 +46,7 @@ AI Models stored in container images
 
 2. [Qwen/Qwen3-Embedding-0.6B](https://huggingface.co/Qwen/Qwen3-Embedding-0.6B)-GGUF(converted)
    - Dockerhub: `docker.io/moosestack/qwen_qwen3-embedding-0.6b-gguf_packaged-modelcar:latest`
-   - Build Example: `podman build --build-arg HUGGINGFACE_MODEL_REPO=Qwen/Qwen3-Embedding-0.6B -t qwen/qwen3-embedding-0.6b-gguf:latest ./huggingface/convert_to_gguf`
+   - Build Example: `podman build --build-arg HUGGINGFACE_MODEL_REPO=Qwen/Qwen3-Embedding-0.6B -t qwen/qwen3-embedding-0.6b-gguf:latest -f convert_to_gguf/Containerfile ./huggingface`
 
 ## Speech Models
 1. [nvidia/nemotron-3.5-asr-streaming-0.6b](https://huggingface.co/nvidia/nemotron-3.5-asr-streaming-0.6b)-GGUF(only GGUF download)
@@ -47,7 +55,7 @@ AI Models stored in container images
    - Build Example: `podman build --squash --build-arg HUGGINGFACE_ALLOW_PATTERNS="*.gguf" --build-arg HUGGINGFACE_MODEL_REPO=nvidia/nemotron-3.5-asr-streaming-0.6b -t nemotron-3.5-asr-streaming-0.6b-gguf:latest ./huggingface`
    - Serve model using [NeMo-Speech.cpp](https://github.com/NVIDIA/NeMo-Speech.cpp) on an x86-64 CPU:
      - `podman run -it -p 8080:8080 docker.io/moosestack/nemo-speech-cpp_nemotron-3.5-asr-streaming-0.6b_cpu-x86-64:latest`
-     - `kubectl apply -k https://github.com/MooseStack/container-packaged-ai-models.git/kubernetes/kustomize/overlays/nemotron-asr?ref=main`
+     - `kubectl apply -f https://raw.githubusercontent.com/MooseStack/container-packaged-ai-models/main/kubernetes/manifests/nemotron-nemospeechcpp-asr.yaml`
 
 2. [nvidia/parakeet-tdt-0.6b-v3](https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3)-GGUF(only GGUF download)
    - This model does NOT do streaming. It transcribes recordings/batches of audio.
@@ -55,4 +63,4 @@ AI Models stored in container images
    - Build Example: `podman build --squash --build-arg HUGGINGFACE_ALLOW_PATTERNS="*.gguf" --build-arg HUGGINGFACE_MODEL_REPO=nvidia/parakeet-tdt-0.6b-v3 -t parakeet-tdt-0.6b-v3-gguf:latest ./huggingface`
    - Serve model using [NeMo-Speech.cpp](https://github.com/NVIDIA/NeMo-Speech.cpp) on an x86-64 CPU:
      - `podman run -it -p 8080:8080 docker.io/moosestack/nemo-speech-cpp_parakeet-tdt-0.6b-v3_cpu-x86-64:latest`
-     - `kubectl apply -k https://github.com/MooseStack/container-packaged-ai-models.git/kubernetes/kustomize/overlays/parakeet-asr?ref=main`
+     - `kubectl apply -f https://raw.githubusercontent.com/MooseStack/container-packaged-ai-models/main/kubernetes/manifests/parakeet-nemospeechcpp-asr.yaml`

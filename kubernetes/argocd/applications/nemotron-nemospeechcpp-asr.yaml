@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nemotron-nemospeechcpp-asr
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/MooseStack/container-packaged-ai-models.git
+    targetRevision: main
+    path: kubernetes/helm
+    helm:
+      valueFiles:
+        - values/nemotron-nemospeechcpp-asr.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: nemotron-nemospeechcpp-asr
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

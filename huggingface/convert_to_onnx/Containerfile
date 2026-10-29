@@ -1,0 +1,57 @@
+## STAGE 1. Download Hugging Face Transformers model (safetensors)
+FROM registry.access.redhat.com/ubi9/python-311:latest AS download
+
+USER root
+
+# Model repo name from Hugging Face are downloaded to /models
+# https://huggingface.co/models — e.g. Qwen/Qwen3-0.6B
+ARG HUGGINGFACE_MODEL_REPO
+ARG HUGGINGFACE_ALLOW_PATTERNS="*"
+ENV HUGGINGFACE_MODEL_REPO=${HUGGINGFACE_MODEL_REPO}
+ENV HUGGINGFACE_ALLOW_PATTERNS=${HUGGINGFACE_ALLOW_PATTERNS}
+
+RUN pip install --no-cache-dir huggingface-hub
+
+COPY download_model.py .
+
+RUN python download_model.py
+
+
+## STAGE 2. Safetensors → ONNX Runtime GenAI (model builder)
+FROM registry.access.redhat.com/ubi9/python-311:latest AS convert
+
+USER root
+
+# Precision for onnxruntime-genai model builder (int4 | fp32 | fp16)
+ARG GENAI_PRECISION=int4
+# Execution provider passed to the builder (cpu | cuda | dml | ...)
+ARG GENAI_EP=cpu
+
+# CPU torch for the builder; onnxruntime-genai ships the model builder module.
+RUN pip install --no-cache-dir \
+        --index-url https://download.pytorch.org/whl/cpu \
+        torch && \
+    pip install --no-cache-dir onnxruntime-genai onnx-ir transformers
+
+COPY --from=download /models /models
+
+RUN mkdir -p /models-genai /tmp/oga-cache && \
+    python -m onnxruntime_genai.models.builder \
+        -i /models \
+        -o /models-genai \
+        -p "${GENAI_PRECISION}" \
+        -e "${GENAI_EP}" \
+        -c /tmp/oga-cache && \
+    test -f /models-genai/genai_config.json
+
+
+## STAGE 3. Modelcar with ORT GenAI package only
+FROM registry.access.redhat.com/ubi10/ubi-micro:latest
+
+LABEL org.opencontainers.image.source="https://github.com/MooseStack/container-packaged-ai-models"
+
+COPY --from=convert /models-genai/ /models/
+
+RUN chmod -Rf 775 /models
+
+USER 1001

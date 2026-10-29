@@ -1,0 +1,74 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: parakeet-nemospeechcpp-asr
+  labels:
+    app: parakeet-nemospeechcpp-asr
+    app.kubernetes.io/name: model
+    app.kubernetes.io/instance: parakeet-nemospeechcpp-asr
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: parakeet-nemospeechcpp-asr
+  labels:
+    app: parakeet-nemospeechcpp-asr
+    app.kubernetes.io/name: model
+    app.kubernetes.io/instance: parakeet-nemospeechcpp-asr
+spec:
+  type: ClusterIP
+  selector:
+    app: parakeet-nemospeechcpp-asr
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: parakeet-nemospeechcpp-asr
+  labels:
+    app: parakeet-nemospeechcpp-asr
+    app.kubernetes.io/name: model
+    app.kubernetes.io/instance: parakeet-nemospeechcpp-asr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: parakeet-nemospeechcpp-asr
+  template:
+    metadata:
+      labels:
+        app: parakeet-nemospeechcpp-asr
+    spec:
+      serviceAccountName: parakeet-nemospeechcpp-asr
+      containers:
+        - name: model
+          image: docker.io/moosestack/nemo-speech-cpp_parakeet-tdt-0.6b-v3_cpu-x86-64:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          startupProbe:
+            tcpSocket:
+              port: http
+            failureThreshold: 30
+            periodSeconds: 10
+          readinessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 30
+          resources:
+            requests:
+              cpu: "1"
+              memory: 2Gi
+            limits:
+              cpu: "4"
+              memory: 8Gi

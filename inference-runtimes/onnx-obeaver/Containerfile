@@ -1,0 +1,37 @@
+# Shared ONNX Runtime GenAI runtime (CPU x86-64).
+# Serves models via Microsoft oBeaver's OpenAI-compatible HTTP API.
+# https://github.com/microsoft/obeaver
+ARG ONNXRUNTIME_GENAI_VERSION=0.18.0
+# Pin oBeaver by commit (no release tags yet).
+ARG OBEAVER_REF=3ff2e9c2408239754ee9529237d28fed29ad6716
+
+FROM registry.access.redhat.com/ubi10/python-314-minimal:latest
+
+ARG ONNXRUNTIME_GENAI_VERSION
+ARG OBEAVER_REF
+
+USER root
+WORKDIR /app
+
+# CPU torch first so oBeaver's torch dependency does not pull a CUDA wheel.
+RUN pip install --no-cache-dir \
+        --index-url https://download.pytorch.org/whl/cpu \
+        "torch>=2.10.0" && \
+    pip install --no-cache-dir \
+        "onnxruntime-genai==${ONNXRUNTIME_GENAI_VERSION}" \
+        "https://github.com/microsoft/obeaver/archive/${OBEAVER_REF}.zip"
+
+RUN chown -R 1001:0 /app && \
+    chmod -R g+rwX /app
+
+USER 1001
+ENV MODEL_PATH=/models \
+    OBEAVER_DEFAULT_ENGINE=ort \
+    OMP_NUM_THREADS=4 \
+    MKL_NUM_THREADS=4 \
+    TOKENIZERS_PARALLELISM=false
+
+EXPOSE 8080
+# Positional model path; ORT engine; bind all interfaces for containers.
+ENTRYPOINT ["obeaver", "serve"]
+CMD ["/models", "-E", "ort", "--host", "0.0.0.0", "--port", "8080"]

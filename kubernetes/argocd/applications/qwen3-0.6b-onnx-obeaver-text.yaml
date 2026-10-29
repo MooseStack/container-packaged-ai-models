@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: qwen3-0.6b-onnx-obeaver-text
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/MooseStack/container-packaged-ai-models.git
+    targetRevision: main
+    path: kubernetes/helm
+    helm:
+      valueFiles:
+        - values/qwen3-0.6b-onnx-obeaver-text.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: qwen3-0.6b-onnx-obeaver-text
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
