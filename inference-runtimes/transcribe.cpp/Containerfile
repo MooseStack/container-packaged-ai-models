@@ -1,0 +1,33 @@
+# Shared transcribe.cpp runtime (CPU x86-64).
+# Serves offline ASR via a minimal OpenAI-compatible HTTP API.
+# https://github.com/handy-computer/transcribe.cpp
+ARG TRANSCRIBE_CPP_VERSION=0.4.1
+
+FROM registry.access.redhat.com/ubi10/python-314-minimal:latest
+
+ARG TRANSCRIBE_CPP_VERSION
+
+USER root
+WORKDIR /app
+
+RUN pip install --no-cache-dir \
+        "transcribe-cpp==${TRANSCRIBE_CPP_VERSION}" \
+        fastapi \
+        python-multipart \
+        "uvicorn[standard]"
+
+COPY serve.py /app/serve.py
+
+RUN chown -R 1001:0 /app && \
+    chmod -R g+rwX /app
+
+USER 1001
+ENV MODEL_PATH=/models \
+    MODEL_FILE= \
+    MODEL_NAME=default \
+    TRANSCRIBE_BACKEND=cpu \
+    HOST=0.0.0.0 \
+    PORT=8080
+
+EXPOSE 8080
+ENTRYPOINT ["python", "/app/serve.py"]

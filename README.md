@@ -71,3 +71,11 @@ AI Models stored in container images
    - Build Example: `podman build --squash --build-arg HUGGINGFACE_ALLOW_PATTERNS="*.nemo" --build-arg HUGGINGFACE_MODEL_REPO=nvidia/parakeet-tdt-0.6b-v3 -t docker.io/moosestack/parakeet-tdt-0.6b-v3-onnx-int8_packaged-modelcar:latest -f convert_to_onnx/parakeet-tdt-0.6b-v3-int8/parakeet.Containerfile ./huggingface`
    - Serve model using [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx) on an x86-64 CPU:
      - `podman run -it -p 8080:8080 docker.io/moosestack/sherpa-onnx_parakeet-tdt-0.6b-v3-int8_cpu-x86-64:latest`
+
+4. [handy-computer/granite-speech-5.0-470m-turboctc-gguf](https://huggingface.co/handy-computer/granite-speech-5.0-470m-turboctc-gguf)
+   - This model does NOT do streaming. It transcribes recordings/batches of audio (English only).
+   - Dockerhub: `docker.io/moosestack/granite-speech-5.0-470m-turboctc-gguf_packaged-modelcar:latest`
+   - Build Example: `podman build --squash --build-arg HUGGINGFACE_ALLOW_PATTERNS="*Q6_K.gguf" --build-arg HUGGINGFACE_MODEL_REPO=handy-computer/granite-speech-5.0-470m-turboctc-gguf -t docker.io/moosestack/granite-speech-5.0-470m-turboctc-gguf_packaged-modelcar:latest ./huggingface`
+   - Serve model using [transcribe.cpp](https://github.com/handy-computer/transcribe.cpp) on an x86-64 CPU:
+     - `podman run -it -p 8080:8080 docker.io/moosestack/transcribe-cpp_granite-speech-5.0-470m-turboctc_cpu-x86-64:latest`
+     - `kubectl apply -f https://raw.githubusercontent.com/MooseStack/container-packaged-ai-models/main/kubernetes/manifests/granite-speech-transcribecpp-asr.yaml`

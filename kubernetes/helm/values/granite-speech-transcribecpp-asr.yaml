@@ -1,0 +1,11 @@
+image:
+  repository: docker.io/moosestack/transcribe-cpp_granite-speech-5.0-470m-turboctc_cpu-x86-64
+  tag: latest
+
+resources:
+  requests:
+    cpu: "1"
+    memory: 1Gi
+  limits:
+    cpu: "4"
+    memory: 4Gi
