@@ -1,9 +1,14 @@
 # container-packaged-ai-models
-AI Models stored in container images
+Small AI Models stored in container images (modelcars). Some are also packaged with OpenAI-Compatible API [inference-runtimes](inference-runtimes) to allow you to run them directly on a rootless environment.
 
-## From [Hugging Face](https://huggingface.co/models)
+- Run using `docker` / `podman` / `kubectl` / `oc`
+- Tested on an `x86-64` CPU
+  - 1 core
+  - 1GB of memory
 
-## Instruct Models
+<details open>
+<summary><h2>Instruct Models</h2></summary>
+
 1. [openai/gpt-oss-20b](https://huggingface.co/openai/gpt-oss-20b)
    - Dockerhub: `docker.io/moosestack/packaged-model-openai_gpt-oss-20b:latest`
    - Build Example: `podman build --build-arg HUGGINGFACE_MODEL_REPO=openai/gpt-oss-20b -t gpt-oss-20b:latest ./huggingface`
@@ -39,7 +44,11 @@ AI Models stored in container images
      - `podman run -it -p 8080:8080 docker.io/moosestack/onnx-obeaver_qwen3-0.6b_cpu-x86-64:latest`
      - `kubectl apply -f https://raw.githubusercontent.com/MooseStack/container-packaged-ai-models/main/kubernetes/manifests/qwen3-0.6b-onnx-obeaver-text.yaml`
 
-## Embedding Models
+</details>
+
+<details open>
+<summary><h2>Embedding Models</h2></summary>
+
 1. [ibm-granite/granite-embedding-english-r2](https://huggingface.co/ibm-granite/granite-embedding-english-r2)
    - Dockerhub: `docker.io/moosestack/granite-embedding-english-r2_packaged-modelcar:latest`
    - Build Example: `podman build --build-arg HUGGINGFACE_MODEL_REPO=ibm-granite/granite-embedding-english-r2 -t ibm-granite/granite-embedding-english-r2:latest ./huggingface`
@@ -48,7 +57,11 @@ AI Models stored in container images
    - Dockerhub: `docker.io/moosestack/qwen_qwen3-embedding-0.6b-gguf_packaged-modelcar:latest`
    - Build Example: `podman build --build-arg HUGGINGFACE_MODEL_REPO=Qwen/Qwen3-Embedding-0.6B -t qwen/qwen3-embedding-0.6b-gguf:latest -f convert_to_gguf/Containerfile ./huggingface`
 
-## Speech Models
+</details>
+
+<details open>
+<summary><h2>Speech Models</h2></summary>
+
 1. [nvidia/nemotron-3.5-asr-streaming-0.6b](https://huggingface.co/nvidia/nemotron-3.5-asr-streaming-0.6b)-GGUF(only GGUF download)
    - This model does streaming (you can use a WebSocket)
    - Dockerhub: `docker.io/moosestack/nemotron-3.5-asr-streaming-0.6b-gguf_packaged-modelcar:latest`
@@ -79,3 +92,5 @@ AI Models stored in container images
    - Serve model using [transcribe.cpp](https://github.com/handy-computer/transcribe.cpp) on an x86-64 CPU:
      - `podman run -it -p 8080:8080 docker.io/moosestack/transcribe-cpp_granite-speech-5.0-470m-turboctc_cpu-x86-64:latest`
      - `kubectl apply -f https://raw.githubusercontent.com/MooseStack/container-packaged-ai-models/main/kubernetes/manifests/granite-speech-transcribecpp-asr.yaml`
+
+</details>
