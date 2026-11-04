@@ -1,13 +1,7 @@
 ### Building
-Package the GGUF modelcar (Q8_0 only), build the shared runtime, then build this model image:
+Package the GGUF modelcar (Q6_K only), build the shared runtime, then build this model image:
 
 ```bash
-podman build --squash \
-	--build-arg HUGGINGFACE_ALLOW_PATTERNS="*Q6_K.gguf" \
-	--build-arg HUGGINGFACE_MODEL_REPO=handy-computer/granite-speech-5.0-470m-turboctc-gguf \
-	-t docker.io/moosestack/granite-speech-5.0-470m-turboctc-gguf_packaged-modelcar:latest \
-	./huggingface
-
 podman build --build-arg TRANSCRIBE_CPP_VERSION=0.4.1 \
 	-t transcribe-cpp-runtime:latest \
 	-f inference-runtimes/transcribe.cpp/Containerfile inference-runtimes/transcribe.cpp

@@ -260,15 +260,30 @@ def read_tokenizer(model_dir: Path, pad_token: str | None) -> dict:
 # ----- Hyperparameters ------------------------------------------------------
 
 
+def read_frontend_configs(model_dir: Path) -> tuple[dict, dict]:
+    """Read current processor settings and optional legacy frontend settings."""
+    preproc_path = model_dir / "preprocessor_config.json"
+    processor_path = model_dir / "processor_config.json"
+    preproc = json.loads(preproc_path.read_text()) if preproc_path.exists() else {}
+    processor = json.loads(processor_path.read_text()) if processor_path.exists() else {}
+    if not preproc and not processor.get("feature_extractor"):
+        raise ValueError(
+            "missing frontend configuration: expected preprocessor_config.json "
+            "or feature_extractor in processor_config.json"
+        )
+    return preproc, processor
+
+
 def read_hparams(config: dict, preproc: dict, processor: dict) -> dict:
     """Merge config.json + the two front-end config files into GGUF hparams.
 
-    The repo ships two front-end descriptions that must agree:
+    Older snapshots ship two front-end descriptions that must agree:
       processor_config.json   mainline GraniteSpeech5FeatureExtractor (the one
                               transformers>=5.16 actually instantiates), which
                               names the stacked width as `feature_size`.
       preprocessor_config.json  the stale trust_remote_code CtcConformerProcessor,
                               the only file that spells `stack_factor`/`deltas`.
+    Current snapshots omit the legacy preprocessor_config.json file.
     Mainline wins on every shared field; the stale file is read only for the two
     keys mainline omits, and every overlapping value is cross-checked so a
     future snapshot cannot let them drift apart silently.
@@ -516,9 +531,7 @@ def main(argv: list[str]) -> int:
     print(f"Source: {model_dir}")
 
     config = json.loads((model_dir / "config.json").read_text())
-    preproc = json.loads((model_dir / "preprocessor_config.json").read_text())
-    processor_path = model_dir / "processor_config.json"
-    processor = json.loads(processor_path.read_text()) if processor_path.exists() else {}
+    preproc, processor = read_frontend_configs(model_dir)
     tok_config = json.loads((model_dir / "tokenizer_config.json").read_text())
 
     arch_declared = (config.get("architectures") or [None])[0]

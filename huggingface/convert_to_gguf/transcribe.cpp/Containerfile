@@ -1,0 +1,77 @@
+# Build with huggingface/ as the context, like the other conversion images:
+# podman build -f huggingface/convert_to_gguf/transcribe.cpp/Containerfile huggingface/
+
+## STAGE 1. Download the original Hugging Face checkpoint
+FROM registry.access.redhat.com/ubi9/python-311:latest AS download
+
+USER root
+
+ARG HUGGINGFACE_MODEL_REPO=ibm-granite/granite-speech-5.0-470m-turboctc
+ARG HUGGINGFACE_ALLOW_PATTERNS="*.json,*.safetensors"
+ENV HUGGINGFACE_MODEL_REPO=${HUGGINGFACE_MODEL_REPO} \
+    HUGGINGFACE_ALLOW_PATTERNS=${HUGGINGFACE_ALLOW_PATTERNS}
+
+RUN pip install --no-cache-dir huggingface-hub
+COPY download_model.py .
+RUN python download_model.py
+
+
+## STAGE 2. Build the quantizer and convert the checkpoint to GGUF
+FROM download AS ggufmodel
+
+# Override with a tag or commit to pin the upstream helpers and quantizer.
+ARG TRANSCRIBE_CPP_REF=main
+ARG GGUF_QUANTIZE_TYPE=Q6_K
+
+RUN dnf install -y git gcc gcc-c++ make && dnf clean all && \
+    pip install --no-cache-dir cmake uv
+
+WORKDIR /opt/transcribe.cpp
+RUN git clone https://github.com/handy-computer/transcribe.cpp.git . && \
+    git checkout "${TRANSCRIBE_CPP_REF}" && \
+    git submodule update --init --recursive && \
+    cmake -S . -B build \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DTRANSCRIBE_BUILD_TOOLS=ON \
+        -DTRANSCRIBE_BUILD_TESTS=OFF \
+        -DTRANSCRIBE_BUILD_EXAMPLES=OFF \
+        -DGGML_NATIVE=OFF && \
+    cmake --build build --target transcribe-quantize --parallel 2
+
+# Keep upstream scripts/lib beside the locally supplied scripts: both import it.
+COPY convert_to_gguf/transcribe.cpp/scripts/ scripts/
+COPY convert_to_gguf/transcribe.cpp/env/ scripts/envs/granite5_ctc/
+RUN uv sync --frozen --project scripts/envs/granite5_ctc
+
+RUN uv run --frozen --project scripts/envs/granite5_ctc \
+        python scripts/convert-granite5_ctc.py /models \
+        --repo-id "${HUGGINGFACE_MODEL_REPO}" \
+        --reference-dtype bf16 --outdir /converted
+
+# Accept one preset or a comma-separated list; empty keeps the BF16 model.
+# Invoke with python so quantize-all.py uses the already installed environment.
+RUN variant="${HUGGINGFACE_MODEL_REPO##*/}" && \
+    mkdir -p /modelcar && \
+    if [ -n "${GGUF_QUANTIZE_TYPE}" ]; then \
+        uv run --frozen --project scripts/envs/granite5_ctc \
+            python scripts/quantize-all.py \
+            "/converted/${variant}-BF16.gguf" \
+            --quantize-bin /opt/transcribe.cpp/build/bin/transcribe-quantize \
+            --presets "${GGUF_QUANTIZE_TYPE}" && \
+        for preset in $(echo "${GGUF_QUANTIZE_TYPE}" | tr ',' ' '); do \
+            cp "/converted/${variant}-${preset}.gguf" /modelcar/ || exit 1; \
+        done; \
+    else \
+        cp "/converted/${variant}-BF16.gguf" /modelcar/; \
+    fi && \
+    chmod -R 775 /modelcar
+
+
+## STAGE 3. Package only the selected GGUF model files
+FROM registry.access.redhat.com/ubi9/ubi-micro:9.4
+
+LABEL org.opencontainers.image.source="https://github.com/MooseStack/container-packaged-ai-models"
+
+COPY --from=ggufmodel /modelcar/ /models/
+
+USER 1001

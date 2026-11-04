@@ -85,12 +85,13 @@ Small AI Models stored in container images (modelcars). Some are also packaged w
    - Serve model using [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx) on an x86-64 CPU:
      - `podman run -it -p 8080:8080 docker.io/moosestack/sherpa-onnx_parakeet-tdt-0.6b-v3-int8_cpu-x86-64:latest`
 
-4. [handy-computer/granite-speech-5.0-470m-turboctc-gguf](https://huggingface.co/handy-computer/granite-speech-5.0-470m-turboctc-gguf)
-   - This model does NOT do streaming. It transcribes recordings/batches of audio (English only).
-   - Dockerhub: `docker.io/moosestack/granite-speech-5.0-470m-turboctc-gguf_packaged-modelcar:latest`
-   - Build Example: `podman build --squash --build-arg HUGGINGFACE_ALLOW_PATTERNS="*Q6_K.gguf" --build-arg HUGGINGFACE_MODEL_REPO=handy-computer/granite-speech-5.0-470m-turboctc-gguf -t docker.io/moosestack/granite-speech-5.0-470m-turboctc-gguf_packaged-modelcar:latest ./huggingface`
+4. [ibm-granite/granite-speech-5.0-470m-turboctc](https://huggingface.co/ibm-granite/granite-speech-5.0-470m-turboctc)-GGUF Q6_K(converted)
+   - This model transcribes recordings/batches of audio. The current upstream checkpoint supports English, French, German, Spanish, Portuguese, Italian, and Japanese.
+   - Dockerhub: `docker.io/moosestack/granite-speech-5.0-470m-turboctc-gguf-q6-k_packaged-modelcar:latest`
+   - Build Example: `podman build --squash --build-arg HUGGINGFACE_MODEL_REPO=ibm-granite/granite-speech-5.0-470m-turboctc --build-arg GGUF_QUANTIZE_TYPE=Q6_K -t docker.io/moosestack/granite-speech-5.0-470m-turboctc-gguf-q6-k_packaged-modelcar:latest -f huggingface/convert_to_gguf/transcribe.cpp/Containerfile ./huggingface`
+      - Downloads the original checkpoint, converts it to BF16 GGUF, then quantizes it to Q6_K using the transcribe.cpp scripts. The build compiles the required `transcribe-quantize` executable.
    - Serve model using [transcribe.cpp](https://github.com/handy-computer/transcribe.cpp) on an x86-64 CPU:
-     - `podman run -it -p 8080:8080 docker.io/moosestack/transcribe-cpp_granite-speech-5.0-470m-turboctc_cpu-x86-64:latest`
-     - `kubectl apply -f https://raw.githubusercontent.com/MooseStack/container-packaged-ai-models/main/kubernetes/manifests/granite-speech-transcribecpp-asr.yaml`
+      - `podman run -it -p 8080:8080 docker.io/moosestack/transcribe-cpp_granite-speech-5.0-470m-turboctc_cpu-x86-64:latest`
+      - `kubectl apply -f https://raw.githubusercontent.com/MooseStack/container-packaged-ai-models/main/kubernetes/manifests/granite-speech-transcribecpp-asr.yaml`
 
 </details>
