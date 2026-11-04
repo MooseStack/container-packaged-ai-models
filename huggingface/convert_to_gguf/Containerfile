@@ -18,13 +18,24 @@ RUN python download_model.py
 
 
 ## STAGE 2. Use llama.cpp full to convert models to gguf format
-FROM ghcr.io/ggml-org/llama.cpp:full-b8740 as ggufmodel
+FROM ghcr.io/ggml-org/llama.cpp:full-b12110 as ggufmodel
+
+# choices=["f32", "f16", "bf16", "q8_0", "tq1_0", "tq2_0", "auto"]
+ARG GGUF_OUTTYPE="auto"
+# Quantization type, For example, "Q6_K" or "Q4_0". If empty, no quantization is performed.
+ARG GGUF_QUANTIZE_TYPE=""
 
 COPY --from=base /models /models
 
 WORKDIR /models
 
-RUN /app/convert_hf_to_gguf.py /models --outfile /models/model.gguf
+RUN /app/convert_hf_to_gguf.py /models --outfile /models/model.gguf --outtype ${GGUF_OUTTYPE}
+
+# Optionally quantize the converted GGUF (for example, Q6_K).
+RUN if [ -n "${GGUF_QUANTIZE_TYPE}" ]; then \
+      /app/llama-quantize /models/model.gguf /models/model-quantized.gguf "${GGUF_QUANTIZE_TYPE}" && \
+      mv /models/model-quantized.gguf /models/model.gguf; \
+    fi
 
 
 ## COPY gguf model and supporting files to a micro image
