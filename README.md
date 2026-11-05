@@ -5,6 +5,8 @@ Small AI Models stored in container images (modelcars). Some are also packaged w
 - Tested on an `x86-64` CPU
   - 1 core
   - 1GB of memory
+- Models packaged with inference server: [Dockerhub](https://hub.docker.com/u/moosestack?page=1&search=cpu)
+- Modelcars (only model weights stored in `/models` path): [Dockerhub](https://hub.docker.com/u/moosestack?page=1&search=packaged-model)
 
 <details open>
 <summary><h2>Instruct Models</h2></summary>
@@ -54,8 +56,8 @@ Small AI Models stored in container images (modelcars). Some are also packaged w
    - Build Example: `podman build --build-arg HUGGINGFACE_MODEL_REPO=ibm-granite/granite-embedding-english-r2 -t ibm-granite/granite-embedding-english-r2:latest ./huggingface`
 
 2. [Qwen/Qwen3-Embedding-0.6B](https://huggingface.co/Qwen/Qwen3-Embedding-0.6B)-GGUF(converted)
-   - Dockerhub: `docker.io/moosestack/qwen_qwen3-embedding-0.6b-gguf_packaged-modelcar:latest`
-   - Build Example: `podman build --squash --build-arg HUGGINGFACE_MODEL_REPO=Qwen/Qwen3-Embedding-0.6B -t docker.io/moosestack/qwen3-embedding-0.6b-gguf:latest -f convert_to_gguf/Containerfile ./huggingface`
+   - Dockerhub: `docker.io/moosestack/qwen3-embedding-0.6b-gguf_packaged-modelcar:latest`
+   - Build Example: `podman build --squash --build-arg HUGGINGFACE_MODEL_REPO=Qwen/Qwen3-Embedding-0.6B -t docker.io/moosestack/qwen3-embedding-0.6b-gguf_packaged-modelcar:latest -f convert_to_gguf/Containerfile ./huggingface`
    - Serve embeddings using [llama.cpp](https://github.com/ggml-org/llama.cpp) on an x86-64 CPU:
      - `podman run -it -p 8080:8080 docker.io/moosestack/llama-cpp_qwen3-embedding-0.6b_cpu-x86-64:latest`
      - `kubectl apply -f https://raw.githubusercontent.com/MooseStack/container-packaged-ai-models/main/kubernetes/manifests/qwen3-0.6b-llamacpp-embedding.yaml`
