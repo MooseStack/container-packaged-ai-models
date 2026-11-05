@@ -38,14 +38,17 @@ Add `--set ingress.enabled=true` or `--set route.enabled=true` for Ingress or an
 ```bash
 curl -s http://127.0.0.1:8080/v1/chat/completions \
   -H 'Content-Type: application/json' \
-  -d '{"model":"qwen3-0.6b","messages":[{"role":"user","content":"Tell me a joke."}],"max_tokens":64}'
+  -d '{"model":"qwen3-0.6b","messages":[{"role":"user","content":"Tell me a joke."}],"max_tokens":64}' | jq -r '.choices[0].message.content'
 ```
 
 Or with the Python smoke client (stdlib only):
 
 ```bash
-python3 inference-runtimes/onnx-obeaver/qwen3-0.6b/chat-completions-test.py
-python3 inference-runtimes/onnx-obeaver/qwen3-0.6b/chat-completions-test.py "What is 2+2?"
+# Start an interactive streaming conversation
+python3 test/chat-completions.py
+
+# Or send one prompt and exit
+python3 test/chat-completions.py "What is 2+2?"
 ```
 
 Env overrides: `ONNX_GENAI_URL` (default `http://127.0.0.1:8080`), `ONNX_GENAI_MODEL`.

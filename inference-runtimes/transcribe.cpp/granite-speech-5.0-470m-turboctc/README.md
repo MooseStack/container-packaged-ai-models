@@ -36,15 +36,15 @@ helm install granite-speech-transcribecpp-asr \
 Add `--set ingress.enabled=true` or `--set route.enabled=true` for Ingress or an OpenShift Route.
 
 ### Test
-Record from the mic until Ctrl+C, or pass a mono 16-bit PCM 16 kHz WAV:
+Record from the mic until Enter (Ctrl+C also works), or pass a mono 16-bit PCM 16 kHz WAV:
 
 ```bash
 python3 -m pip install -r inference-runtimes/transcribe.cpp/granite-speech-5.0-470m-turboctc/requirements.txt
-python3 inference-runtimes/transcribe.cpp/granite-speech-5.0-470m-turboctc/speech-to-text-test.py
-python3 inference-runtimes/transcribe.cpp/granite-speech-5.0-470m-turboctc/speech-to-text-test.py recording.wav
+python3 test/audio-batch.py
+python3 test/audio-batch.py recording.wav
 ```
 
-Optional: `TRANSCRIBE_CPP_URL` (default `http://127.0.0.1:8080`), `TRANSCRIBE_CPP_API_KEY`.
+Optional: `AUDIO_TRANSCRIPTION_URL` (default `http://127.0.0.1:8080`), `AUDIO_TRANSCRIPTION_API_KEY`.
 
 ```bash
 curl -s http://127.0.0.1:8080/v1/audio/transcriptions \

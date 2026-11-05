@@ -37,12 +37,12 @@ Add `--set ingress.enabled=true` or `--set route.enabled=true` for Ingress or an
 ### HTTPS streaming client
 The speech test client supports secure WebSocket endpoints. Set `NEMO_SPEECH_WS_URL` to the `wss://` realtime endpoint and set `NEMO_SPEECH_API_KEY` when the server requires authentication:
 
-`NEMO_SPEECH_WS_URL=wss://speech.example.com/v1/realtime NEMO_SPEECH_API_KEY=your-key python3 speech-to-text-test.py`
+`NEMO_SPEECH_WS_URL=wss://speech.example.com/v1/realtime NEMO_SPEECH_API_KEY=your-key python3 test/audio-websocket.py`
 
 - Default is ws://127.0.0.1:8080/v1/realtime
 
-With the container running, execute `speech-to-text-test.py` on the host and press `Ctrl+C` when you are finished speaking.
+With the container running, execute the streaming client on the host and press `Ctrl+C` when you are finished speaking. Install `pyaudio` and `websocket-client` first (see `requirements.txt`).
 
 ```bash
-python3 inference-runtimes/NeMo-Speech.cpp/nemotron-3.5-asr-streaming-0.6b/speech-to-text-test.py
+python3 test/audio-websocket.py
 ```

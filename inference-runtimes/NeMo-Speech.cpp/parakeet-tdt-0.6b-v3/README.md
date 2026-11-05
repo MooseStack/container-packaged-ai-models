@@ -35,19 +35,19 @@ helm install parakeet-nemospeechcpp-asr \
 Add `--set ingress.enabled=true` or `--set route.enabled=true` for Ingress or an OpenShift Route.
 
 ### Offline transcription client
-Parakeet TDT is offline-only (full-utterance recognition). The test client records from the microphone until `Ctrl+C`, then `POST`s a WAV to `/v1/audio/transcriptions`. You can also pass an existing WAV file.
+Parakeet TDT is offline-only (full-utterance recognition). The test client records from the microphone until `Enter` (or `Ctrl+C`), then `POST`s a WAV to `/v1/audio/transcriptions`. You can also pass an existing WAV file.
 
 ```bash
 python3 -m pip install -r inference-runtimes/NeMo-Speech.cpp/parakeet-tdt-0.6b-v3/requirements.txt
 
 # Record from mic, then transcribe
-python3 inference-runtimes/NeMo-Speech.cpp/parakeet-tdt-0.6b-v3/speech-to-text-test.py
+python3 test/audio-batch.py
 
 # Or transcribe a WAV file
-python3 inference-runtimes/NeMo-Speech.cpp/parakeet-tdt-0.6b-v3/speech-to-text-test.py recording.wav
+python3 test/audio-batch.py recording.wav
 ```
 
 Optional environment variables:
 
-- `NEMO_SPEECH_URL` (default `http://127.0.0.1:8080`)
-- `NEMO_SPEECH_API_KEY` when the server requires authentication
+- `AUDIO_TRANSCRIPTION_URL` (default `http://127.0.0.1:8080`)
+- `AUDIO_TRANSCRIPTION_API_KEY` when the server requires authentication

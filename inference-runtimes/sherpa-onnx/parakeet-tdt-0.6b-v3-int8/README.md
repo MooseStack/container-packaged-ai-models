@@ -21,14 +21,15 @@ podman run --rm -it \
 ```
 
 ### Test
-Record from the mic until Ctrl+C, or pass a mono 16-bit PCM WAV:
+Record from the mic until Enter (Ctrl+C also works), or pass a mono 16-bit PCM WAV:
 
 ```bash
 python3 -m pip install pyaudio
-python3 inference-runtimes/sherpa-onnx/parakeet-tdt-0.6b-v3-int8/speech-to-text-test.py
+python3 test/audio-batch.py
+python3 test/audio-batch.py recording.wav
 ```
 
-Optional: `SHERPA_ONNX_URL` (default `http://127.0.0.1:8080`), `SHERPA_ONNX_API_KEY`.
+Optional: `AUDIO_TRANSCRIPTION_URL` (default `http://127.0.0.1:8080`), `AUDIO_TRANSCRIPTION_API_KEY`.
 
 ```bash
 curl -s http://127.0.0.1:8080/v1/audio/transcriptions \
