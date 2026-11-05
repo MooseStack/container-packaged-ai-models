@@ -1,0 +1,12 @@
+# Shared llama.cpp HTTP server runtime (CPU x86-64).
+# The upstream server image includes /app/llama-server and its runtime libraries.
+FROM ghcr.io/ggml-org/llama.cpp:server-b12110
+
+# OpenShift may assign an arbitrary UID with GID 0; the server only needs
+# read access to its binary and model files.
+USER 1001
+ENV LLAMA_ARG_HOST=0.0.0.0 \
+    LLAMA_ARG_PORT=8080
+
+EXPOSE 8080
+ENTRYPOINT ["/app/llama-server"]

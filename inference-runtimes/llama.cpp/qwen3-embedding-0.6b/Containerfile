@@ -1,0 +1,7 @@
+FROM llama-cpp-runtime:latest
+
+# The converted modelcar stores its GGUF at /models/model.gguf.
+COPY --from=docker.io/moosestack/qwen_qwen3-embedding-0.6b-gguf_packaged-modelcar:latest /models/model.gguf /models/model.gguf
+
+# Qwen3-Embedding requires last-token pooling for a single vector per input.
+CMD ["--model", "/models/model.gguf", "--embedding", "--pooling", "last", "--alias", "qwen3-embedding-0.6b", "--ctx-size", "8192", "--parallel", "1", "--batch-size", "512", "--threads", "4", "--threads-batch", "4"]

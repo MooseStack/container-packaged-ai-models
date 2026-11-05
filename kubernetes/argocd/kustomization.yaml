@@ -6,3 +6,4 @@ resources:
   - applications/nemotron-nemospeechcpp-asr.yaml
   - applications/parakeet-nemospeechcpp-asr.yaml
   - applications/qwen3-0.6b-onnx-obeaver-text.yaml
+  - applications/qwen3-0.6b-llamacpp-embedding.yaml
