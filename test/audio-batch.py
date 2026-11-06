@@ -5,6 +5,7 @@ import argparse
 import io
 import json
 import os
+import time
 import wave
 from pathlib import Path
 from urllib.error import HTTPError, URLError
@@ -90,7 +91,16 @@ def main():
         results = []
         for batch_number, batch in enumerate(wav_batches(wav_bytes), start=1):
             print(f"Transcribing 5-second batch {batch_number}...", flush=True)
-            results.append(transcribe(batch, filename, args, url))
+            started = time.monotonic()
+            result = transcribe(batch, filename, args, url)
+            results.append(result)
+            batch_text = result.get("text", "") if isinstance(result, dict) else str(result)
+            elapsed = time.monotonic() - started
+            print(
+                f"Batch {batch_number} completed in {elapsed:.1f}s: "
+                f"{batch_text.strip() or '[no transcription]'}",
+                flush=True,
+            )
     except HTTPError as error:
         print(f"Server error ({error.code}): {error.read().decode(errors='replace')}")
         return 1
