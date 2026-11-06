@@ -15,7 +15,7 @@ python3 test/embeddings.py "First text" "Second text"
 python3 test/embeddings.py --show-all "Embed this text!"
 
 # Batch transcription from a WAV file
-python3 test/audio-batch.py recording.wav
+python3 test/audio-batch.py test/sample-recording.wav
 
 # Record from the microphone, then transcribe
 python3 test/audio-batch.py

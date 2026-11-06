@@ -26,13 +26,13 @@ Record from the mic until Enter (Ctrl+C also works), or pass a mono 16-bit PCM W
 ```bash
 python3 -m pip install pyaudio
 python3 test/audio-batch.py
-python3 test/audio-batch.py recording.wav
+python3 test/audio-batch.py test/sample-recording.wav
 ```
 
 Optional: `AUDIO_TRANSCRIPTION_URL` (default `http://127.0.0.1:8080`), `AUDIO_TRANSCRIPTION_API_KEY`.
 
 ```bash
 curl -s http://127.0.0.1:8080/v1/audio/transcriptions \
-  -F file=@recording.wav \
+  -F file=@test/sample-recording.wav \
   -F model=parakeet-tdt-0.6b-v3-int8
 ```

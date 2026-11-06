@@ -44,7 +44,7 @@ python3 -m pip install -r inference-runtimes/NeMo-Speech.cpp/parakeet-tdt-0.6b-v
 python3 test/audio-batch.py
 
 # Or transcribe a WAV file
-python3 test/audio-batch.py recording.wav
+python3 test/audio-batch.py test/sample-recording.wav
 ```
 
 Optional environment variables:
