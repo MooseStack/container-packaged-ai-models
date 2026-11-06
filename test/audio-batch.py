@@ -2,14 +2,39 @@
 """Smoke-test an offline OpenAI-style audio transcription endpoint."""
 
 import argparse
+import io
 import json
 import os
+import wave
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 from uuid import uuid4
 
 from _audio import record_wav
+
+BATCH_SECONDS = 5
+
+
+def wav_batches(wav_bytes, seconds=BATCH_SECONDS):
+    """Yield valid WAV files containing at most ``seconds`` of audio each."""
+    with wave.open(io.BytesIO(wav_bytes), "rb") as source:
+        frames_per_batch = max(1, int(source.getframerate() * seconds))
+        params = source.getparams()
+        while True:
+            frames = source.readframes(frames_per_batch)
+            if not frames:
+                return
+
+            batch = io.BytesIO()
+            with wave.open(batch, "wb") as destination:
+                destination.setnchannels(params.nchannels)
+                destination.setsampwidth(params.sampwidth)
+                destination.setframerate(params.framerate)
+                destination.setcomptype(params.comptype, params.compname)
+                destination.writeframes(frames)
+            yield batch.getvalue()
+
 
 def multipart(wav_bytes, filename, model, response_format):
     boundary = f"----audioTest{uuid4().hex}"
@@ -30,6 +55,25 @@ def multipart(wav_bytes, filename, model, response_format):
     return boundary, bytes(body)
 
 
+def transcribe(wav_bytes, filename, args, url):
+    boundary, body = multipart(
+        wav_bytes, filename, args.model, args.response_format
+    )
+    headers = {"Content-Type": f"multipart/form-data; boundary={boundary}"}
+    if args.api_key:
+        headers["Authorization"] = f"Bearer {args.api_key}"
+    request = Request(
+        f"{url}/v1/audio/transcriptions",
+        data=body,
+        headers=headers,
+        method="POST",
+    )
+    with urlopen(request) as response:
+        payload = response.read().decode()
+        content_type = response.headers.get("Content-Type", "")
+    return json.loads(payload) if "application/json" in content_type or payload.lstrip().startswith("{") else payload
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--url", default=os.getenv("AUDIO_TRANSCRIPTION_URL", "http://127.0.0.1:8080"), help="Server base URL")
@@ -43,27 +87,25 @@ def main():
     try:
         wav_bytes = args.wav.read_bytes() if args.wav else record_wav()
         filename = args.wav.name if args.wav else "recording.wav"
-        boundary, body = multipart(
-            wav_bytes, filename, args.model, args.response_format
-        )
-        headers = {"Content-Type": f"multipart/form-data; boundary={boundary}"}
-        if args.api_key:
-            headers["Authorization"] = f"Bearer {args.api_key}"
-        request = Request(f"{url}/v1/audio/transcriptions", data=body, headers=headers, method="POST")
-        with urlopen(request) as response:
-            payload = response.read().decode()
-            content_type = response.headers.get("Content-Type", "")
-        result = json.loads(payload) if "application/json" in content_type or payload.lstrip().startswith("{") else payload
+        results = []
+        for batch_number, batch in enumerate(wav_batches(wav_bytes), start=1):
+            print(f"Transcribing 5-second batch {batch_number}...", flush=True)
+            results.append(transcribe(batch, filename, args, url))
     except HTTPError as error:
         print(f"Server error ({error.code}): {error.read().decode(errors='replace')}")
         return 1
-    except (URLError, OSError, RuntimeError, ValueError) as error:
+    except (URLError, OSError, RuntimeError, ValueError, wave.Error) as error:
         print(f"Could not transcribe audio: {error}")
         return 1
 
-    print(result.get("text", json.dumps(result, indent=2)) if isinstance(result, dict) else result)
-    if isinstance(result, dict) and result.get("words"):
-        print(f"{len(result['words'])} words with timestamps")
+    if all(isinstance(result, dict) for result in results):
+        text = " ".join(result.get("text", "").strip() for result in results).strip()
+        print(text or json.dumps(results, indent=2))
+        word_count = sum(len(result.get("words", [])) for result in results)
+        if word_count:
+            print(f"{word_count} words with timestamps")
+    else:
+        print(" ".join(str(result).strip() for result in results).strip())
     return 0
 
 
